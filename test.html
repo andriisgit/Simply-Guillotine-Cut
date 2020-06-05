@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <script type="text/javascript">
+  function map() {
+    var xmlHttp = new XMLHttpRequest();
+    var data = [];
+    data = getFormData();
+    console.log(data.name);
+    xmlHttp.open('post', 'cut.php', true);
+    xmlHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xmlHttp.send(data);
+    xmlHttp.onreadystatechange = function() {
+      if (xmlHttp.readyState === 4) {
+        if (xmlHttp.status === 200) {
+          //success.call(null, xmlHttp.responseText);
+          showCutMap(this);
+        } else {
+          //error.call(null, xmlHttp.responseText);
+          alert('Err');
+        }
+      } else {
+        //still processing
+      }
+    };
+  }
+
+  function getFormData() {
+    var dataArray = [];
+    var sendForm =  document.getElementsByName('cut-map-data')[0];
+    //Getting the data from all elements in the form
+    for (var i = 0; i < sendForm.elements.length; i++) {
+      var encodedData = encodeURIComponent(sendForm.elements[i].name);
+      encodedData += "=";
+      encodedData += encodeURIComponent(sendForm.elements[i].value);
+      dataArray.push(encodedData);
+    }
+    return dataArray.join("&");
+  }
+
+  function showCutMap(data) {
+    //console.log(data.responseText);
+    var bar = document.getElementsByName('cut-map-result-html')[0];
+    bar.innerHTML = JSON.parse(data.responseText);
+  }
+
+  function fillDefault1() {
+    document.getElementsByName('barw')[0].value = 410;
+    document.getElementsByName('barh')[0].value = 250;
+    document.getElementsByName('zajavki')[0].value = `70*79,
+90*90,
+90*60,
+60*90,
+158*64,
+120*80,
+240*94,
+60*80`;
+  }
+
+  function fillDefault2() {
+    document.getElementsByName('barw')[0].value = 300;
+    document.getElementsByName('barh')[0].value = 140;
+    document.getElementsByName('zajavki')[0].value = `200*60,
+220*60,
+140*60`;
+  }
+
+  function fillTestValues() {
+    var zajavki = '', number = getRandomIntInclusive(3, 10);
+
+    document.getElementsByName('barw')[0].value = getRandomIntInclusive((window.innerWidth / 3), (window.innerWidth / 2));
+    document.getElementsByName('barh')[0].value = getRandomIntInclusive(140, 260);
+
+    for (let i = 0; i < number; i++ ) {
+      if (zajavki != '') {
+        zajavki += ",\n";
+      }
+      zajavki += getRandomIntInclusive(30, 200).toString() + '*' + getRandomIntInclusive(20, (window.innerWidth / 4)).toString();
+    }
+    document.getElementsByName('zajavki')[0].value = zajavki;
+  }
+
+  function getRandomIntInclusive(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+  </script>
+ </head>
+ <body>
+  <form name="cut-map-data">
+    <p>Enter bar width: <input type="number" name="barw"/></p>
+    <p>Enter bar height: <input type="number" name="barh"/></p>
+    <p>Enter elements sizes (H*W):
+    <textarea rows="10" cols="10" name="zajavki"></textarea></p>
+  </form>
+  <button type="button" onclick="fillDefault1()">Заповнити значеннями вар.1</button>
+  <button type="button" onclick="fillDefault2()">Заповнити значеннями вар.2</button>
+  <button type="button" onclick="fillTestValues()">Заповнити випадковими значеннями</button>
+  <br/><br/><button type="button" onclick="map()" name="cut" value="mapit">Розмiстити!</button>
+  <output name="cut-map-result-html"></output>
+  <!-- <div class="cut-map-result-html"></div> -->
+ </body>
+</html>
